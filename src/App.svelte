@@ -1,7 +1,33 @@
+<script module>
+  import translations from "./translations.js";
+
+  const localeKey = "momsen.locale"
+
+  function initialLocale() {
+    const params = new URLSearchParams(location.search)
+    const fromUrl = params.get("lang")?.replace(/-.*/, '')
+    if (fromUrl && translations[fromUrl]) {
+      console.debug('locale from url', fromUrl)
+      return fromUrl
+    }
+
+    for (const tag of navigator.languages) {
+      const lang = tag.replace(/-.*/, '')
+      if (lang && translations[lang]) {
+        console.debug('navigator.language', tag, lang)
+        return lang
+      }
+    }
+
+    console.debug('default locale')
+    return "sv"
+  }
+</script>
 <script>
-  import {Pris} from "./lib/Pris.svelte.js";
-  import Toggle from "./lib/Toggle.svelte";
-  import {onMount} from "svelte";
+  import {Pris} from "./lib/Pris.svelte.js"
+  import Toggle from "./lib/Toggle.svelte"
+  import {onMount} from "svelte"
+  import {locale, t} from "./i18n.svelte.js"
 
   const pris = new Pris()
   let priskalkyl = $state(false)
@@ -19,6 +45,10 @@
   })
 
   onMount(() => {
+    const lang = initialLocale()
+    document.documentElement.lang = lang
+    $locale = lang
+
     initialized = true
     const json = sessionStorage.getItem('state')
     if (!json) {
@@ -47,51 +77,52 @@
 {/snippet}
 
 {#snippet Momssats()}
-  {@render Label("moms", "Momssats")}
+  {@render Label("moms", $t("moms.select.label"))}
   <select id="moms" bind:value={pris.moms}
           class="w-full sm:text-lg border border-gray-200 rounded px-4 py-2 focus:outline-blue-500 focus:outline-2">
-    <option value={12}>12% (livsmedel)</option>
-    <option value={25}>25% (vanligast)</option>
-    <option value={6}>6%</option>
+    <option value={25}>{$t('moms.option.25')}</option>
+    <option value={12}>{$t('moms.option.12')}</option>
+    <option value={6}>{$t('moms.option.6')}</option>
   </select>
 {/snippet}
 
 {#snippet InklusiveMoms()}
-  {@render Label("inkl", "Pris (inkl. moms)")}
+  {@render Label("inkl", $t("inkl.input.label"))}
   <input id="inkl" type="text" inputmode="numeric" bind:value={pris.inkl.text} class={[inputClasses, 'no-arrows']}
          {onclick} onfocus={() => pris.fokus = 'inkl'} onblur={pris.inkl.commit}>
 {/snippet}
 
 {#snippet ExklusiveMoms()}
-  {@render Label("exkl", "Exklusive moms")}
+  {@render Label("exkl", $t("exkl.input.label"))}
   <input id="exkl" type="text" inputmode="numeric" bind:value={pris.exkl.text} class={[inputClasses, 'no-arrows']}
          {onclick}
          onfocus={() => pris.fokus = 'exkl'} onblur={pris.exkl.commit}>
 {/snippet}
 
 <div class="max-w-xl mx-auto sm:mt-10 p-4">
-  <main class="">
-    <div class="flex items-center">
-      <h1 class="font-medium text-3xl text-center mb-2 mr-auto">Momsen</h1>
-      <Toggle id="kalkylator" enabled={priskalkyl} onclick={() => priskalkyl = !priskalkyl} label="Priskalkyl"/>
+  <main>
+    <div class="flex items-center mb-2">
+      <h1 class="font-medium text-3xl text-center mr-auto">Momsen</h1>
+      <Toggle id="kalkylator" enabled={priskalkyl} onclick={() => priskalkyl = !priskalkyl}
+              label={$t('priskalkyl.toggle.label')}/>
     </div>
     <div class="grid grid-cols-[max-content_1fr] gap-4 items-center">
       {#if priskalkyl}
-        {@render Label("inkop", "Inköp (exkl. moms)")}
+        {@render Label("inkop", $t("inkop.input.label"))}
         <input id="inkop" type="text" inputmode="numeric" bind:value={pris.inkop.text} min="0"
-               class={[inputClasses, 'no-arrows']} {onclick}>
+               class={[inputClasses, 'no-arrows']} {onclick} onblur={pris.inkop.commit}>
 
         {@render InklusiveMoms()}
         {@render ExklusiveMoms()}
         {@render Momssats()}
 
-        {@render Label("vinst", "Vinst (kronor)")}
+        {@render Label("vinst", $t("vinst.input.label"))}
         <input id="vinst" type="text" inputmode="numeric" bind:value={pris.vinst.text} class={[inputClasses]} step="0.5"
-               {onclick}>
+               {onclick} onblur={pris.vinst.commit}>
 
-        {@render Label("marginal", "Marginal (%)")}
+        {@render Label("marginal", $t("marginal.input.label"))}
         <input id="marginal" type="text" inputmode="numeric" bind:value={pris.marginal.text} class={inputClasses}
-               {onclick}>
+               {onclick} onblur={pris.marginal.commit}>
       {:else}
         {@render InklusiveMoms()}
         {@render ExklusiveMoms()}
@@ -104,15 +135,18 @@
     <nav>
       <ul class="flex items-center space-x-2 text-xs">
         <li>
-          Ett verktyg från <a href="https://mitang.se" class="underline">Mitang AB</a>
+          <span class="hidden sm:inline">{$t('footer.verktyg.label') + ' '}</span><a href="https://mitang.se"
+                                                                                     class="underline">Mitang AB</a>
+        </li>
+        <li>
+          <a href="https://github.com/aenlr/momsen" class="underline">Github</a>
         </li>
         <li>
           <a
             href="https://skatteverket.se/foretagochorganisationer/moms/saljavarorochtjanster/momssatspavarorochtjanster.4.58d555751259e4d66168000409.html"
             class="underline"
             target="_blank"
-          >Momssatser
-            på Skatteverket</a>
+          >{$t('footer.momslank.text')}</a>
         </li>
       </ul>
     </nav>
