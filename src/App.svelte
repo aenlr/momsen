@@ -72,7 +72,7 @@
          onfocus={() => pris.fokus = 'exkl'} onblur={pris.exkl.commit}>
 {/snippet}
 
-<div class="max-w-xl mx-auto sm:mt-10 p-4">
+<div class="max-w-xl mx-auto sm:mt-4 p-4">
   <main>
     <div class="flex items-center mb-2">
       <h1 class="font-medium text-3xl text-center mr-auto">Momsen</h1>
