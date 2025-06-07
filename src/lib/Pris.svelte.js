@@ -1,5 +1,9 @@
 let separator = $state(1.5.toLocaleString().includes(',') ? ',' : '.')
 
+export function formatDecimals(value, decimals) {
+  return value.toFixed(decimals).replace('.', separator)
+}
+
 class Pristext {
   #text = $state('')
   #prev = $state('')
@@ -11,7 +15,7 @@ class Pristext {
   constructor(value, decimaler, update) {
     this.#value = value
     this.#decimaler = decimaler
-    this.#text = value.toFixed(decimaler).replace('.', separator)
+    this.#text = formatDecimals(value, decimaler)
     this.#prev = this.#text
     this.#update = update
   }
@@ -70,12 +74,13 @@ class Pristext {
   }
 
   commit = () => {
-    if (this.#valid) {
-      this.#text = this.#value.toFixed(this.#decimaler).replace('.', separator)
-    } else {
+    if (!this.#valid) {
       this.#valid = true
-      this.#text = this.#prev
+      this.#value = 0
+      this.#update(0)
     }
+    this.#text = formatDecimals(this.#value, this.#decimaler)
+    this.#prev = this.#text
   }
 
   toJSON() {
@@ -130,6 +135,8 @@ export class Pris {
   #marginal = new Pristext(0, 2, () => this.#marginalAndrad())
   #vinst = new Pristext(0, 2, () => this.#vinstAndrad())
   fokus = $state('')
+
+  inkopInkl = $derived(this.#inkop.value * (100 + this.#moms) / 100)
 
   _vinst() {
     return this.#exkl.value - this.#inkop.value

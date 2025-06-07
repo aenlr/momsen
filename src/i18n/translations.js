@@ -1,5 +1,7 @@
 export default {
   sv: {
+    "flag": "🇸🇪",
+    "name": "Svenska",
     // Fields
     "exkl.input.label": "Exklusive moms",
     "inkl.input.label": "Pris (inkl. moms)",
@@ -18,9 +20,11 @@ export default {
   },
 
   th: {
+    "flag": "🇹🇭",
+    "name": "ภาษาไทย",
     // Fields
     "exkl.input.label": "ราคาไม่รวมภาษี",
-    "inkl.input.label": "ราคารัวมภาษี",
+    "inkl.input.label": "ราคาขาย (รัวมภาษี)",
     "inkop.input.label": "ราคาซื้อ (ไม่รวมภาษี)",
     "marginal.input.label": "กำไร (%)",
     "moms.option.6": "6%",

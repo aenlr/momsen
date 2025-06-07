@@ -1,31 +1,9 @@
-<script module>
-  import translations from "./translations.js";
-
-  function initialLocale() {
-    const params = new URLSearchParams(location.search)
-    const fromUrl = params.get("lang")?.replace(/-.*/, '')
-    if (fromUrl && translations[fromUrl]) {
-      console.debug('locale from url', fromUrl)
-      return fromUrl
-    }
-
-    for (const tag of navigator.languages) {
-      const lang = tag.replace(/-.*/, '')
-      if (lang && translations[lang]) {
-        console.debug('navigator.language', tag, lang)
-        return lang
-      }
-    }
-
-    console.debug('default locale')
-    return "sv"
-  }
-</script>
 <script>
   import {Pris} from "./lib/Pris.svelte.js"
   import Toggle from "./lib/Toggle.svelte"
   import {onMount} from "svelte"
-  import {locale, t} from "./i18n.svelte.js"
+  import {locale, locales, t} from "./i18n/i18n.svelte.js"
+  import translations from "./i18n/translations.js";
 
   const pris = new Pris()
   let priskalkyl = $state(false)
@@ -39,16 +17,13 @@
     const json = JSON.stringify(state)
     if (initialized) {
       sessionStorage.setItem('state', json)
+      localStorage.setItem('state', json)
     }
   })
 
   onMount(() => {
-    const lang = initialLocale()
-    document.documentElement.lang = lang
-    $locale = lang
-
     initialized = true
-    const json = sessionStorage.getItem('state')
+    const json = sessionStorage.getItem('state') ?? localStorage.getItem('state')
     if (!json) {
       return
     }
@@ -67,11 +42,11 @@
     event.target.select()
   }
 
-  const inputClasses = 'border border-gray-200 rounded p-4 font-bold text-2xl w-full focus-within:outline-blue-500 focus-within:outline-2'
+  const inputClasses = 'border border-gray-200 rounded py-2 px-4 font-bold text-2xl w-full focus-within:outline-blue-500 focus-within:outline-2'
 </script>
 
 {#snippet Label(id, text)}
-  <label for={id} class="font-medium sm:text-xl">{text}</label>
+  <label for={id} class="font-medium sm:text-lg text-gray-600">{text}</label>
 {/snippet}
 
 {#snippet Momssats()}
@@ -109,10 +84,7 @@
         {@render Label("inkop", $t("inkop.input.label"))}
         <input id="inkop" type="text" inputmode="numeric" bind:value={pris.inkop.text} min="0"
                class={[inputClasses, 'no-arrows']} {onclick} onblur={pris.inkop.commit}>
-
         {@render InklusiveMoms()}
-        {@render ExklusiveMoms()}
-        {@render Momssats()}
 
         {@render Label("vinst", $t("vinst.input.label"))}
         <input id="vinst" type="text" inputmode="numeric" bind:value={pris.vinst.text} class={[inputClasses]} step="0.5"
@@ -121,6 +93,9 @@
         {@render Label("marginal", $t("marginal.input.label"))}
         <input id="marginal" type="text" inputmode="numeric" bind:value={pris.marginal.text} class={inputClasses}
                {onclick} onblur={pris.marginal.commit}>
+
+        {@render Momssats()}
+
       {:else}
         {@render InklusiveMoms()}
         {@render ExklusiveMoms()}
@@ -129,7 +104,7 @@
     </div>
   </main>
 
-  <footer class="[@media(min-height:568px)]:fixed bottom-0 py-4">
+  <footer class="pt-4">
     <nav>
       <ul class="flex items-center space-x-2 text-xs">
         <li>
@@ -146,8 +121,16 @@
             target="_blank"
           >{$t('footer.momslank.text')}</a>
         </li>
+
+        <li class="ml-auto flex items-center justify-end gap-1">
+          {#each locales as lang}
+            <button type="button" class="text-lg rounded-full shadow flex items-center p-1 aspect-square"
+                    title={translations[lang].name} onclick={() => $locale = lang}>{translations[lang].flag}</button>
+          {/each}
+        </li>
       </ul>
     </nav>
+
   </footer>
 </div>
 
