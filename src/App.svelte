@@ -48,7 +48,8 @@
 
 {#snippet Momssats()}
   {@render Label("moms", "Momssats")}
-  <select id="moms" bind:value={pris.moms} class="w-full sm:text-lg border border-gray-200 rounded px-4 py-2 focus:outline-blue-500 focus:outline-2">
+  <select id="moms" bind:value={pris.moms}
+          class="w-full sm:text-lg border border-gray-200 rounded px-4 py-2 focus:outline-blue-500 focus:outline-2">
     <option value={12}>12% (livsmedel)</option>
     <option value={25}>25% (vanligast)</option>
     <option value={6}>6%</option>
@@ -100,9 +101,21 @@
   </main>
 
   <footer class="[@media(min-height:568px)]:fixed bottom-0 py-4">
-    <p class="text-xs">
-      Ett verktyg från <a href="https://mitang.se" class="underline">Mitang AB</a>
-    </p>
+    <nav>
+      <ul class="flex items-center space-x-2 text-xs">
+        <li>
+          Ett verktyg från <a href="https://mitang.se" class="underline">Mitang AB</a>
+        </li>
+        <li>
+          <a
+            href="https://skatteverket.se/foretagochorganisationer/moms/saljavarorochtjanster/momssatspavarorochtjanster.4.58d555751259e4d66168000409.html"
+            class="underline"
+            target="_blank"
+          >Momssatser
+            på Skatteverket</a>
+        </li>
+      </ul>
+    </nav>
   </footer>
 </div>
 
