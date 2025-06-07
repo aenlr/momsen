@@ -1,8 +1,6 @@
 <script module>
   import translations from "./translations.js";
 
-  const localeKey = "momsen.locale"
-
   function initialLocale() {
     const params = new URLSearchParams(location.search)
     const fromUrl = params.get("lang")?.replace(/-.*/, '')
